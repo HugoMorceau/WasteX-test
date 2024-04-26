@@ -1,6 +1,17 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
 
+import { RouterLink, RouterView } from 'vue-router'
+import { useBreweryStore } from '@/stores/brewery'
+import { fetchBreweries } from '@/api/openbrewery'
+
+const store = useBreweryStore()
+
+const handleSubmit = () => {
+  // fetchBreweries()
+  store.searchBreweries()
+  console.log('stored breweries', store.breweries)
+  console.log('Menu button clicked')
+}
 </script>
 
 <template>
@@ -8,78 +19,22 @@ import { RouterLink, RouterView } from 'vue-router'
     
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
+      
     </div>
   </header>
 
   <RouterView />
+  <button @click="handleSubmit">Menu</button>
+  <ul>
+    <li v-for="(brewery, index) in store.breweries" :key="brewery.id">
+      {{ index +1  }} -  {{brewery.name }}
+    </li>
+  </ul>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
