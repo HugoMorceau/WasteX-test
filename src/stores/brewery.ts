@@ -3,11 +3,12 @@ import { fetchBreweries } from '../api/openbrewery'
 
 export const useBreweryStore = defineStore('brewery', {
   state: () => ({
-    breweries: []
+    breweries: [],
+    query: ''
   }),
   actions: {
-    async searchBreweries() {
-      this.breweries = await fetchBreweries()
+    async searchBreweries(query: string) {
+      this.breweries = await fetchBreweries(query)
     }
   }
 })
