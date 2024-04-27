@@ -1,8 +1,13 @@
 <script setup lang="ts">
 
+import { useBreweryStore } from '@/stores/brewery';
 import SearchBar from './components/SearchBar.vue';
 import HomeView from './views/HomeView.vue';
-
+const store = useBreweryStore()
+const loadMore = () => {
+  console.log(store.currentPage)
+  store.loadMore()
+}
 </script>
 
 <template>
@@ -19,5 +24,6 @@ import HomeView from './views/HomeView.vue';
 
   <SearchBar />
   <HomeView />
+  <button @click="loadMore()"  class="flex justify-center mt-2 text-primary-hover"> {{store.hasMore ? "Load More" : "No More"}}</button>
 </div>
 </template>

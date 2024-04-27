@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchBreweries } from '../api/openbrewery'
+import { fetchBreweries, fetchBreweriesPage } from '../api/openbrewery'
 interface Brewery {
   id: string
   name: string
@@ -24,12 +24,27 @@ export const useBreweryStore = defineStore('brewery', {
     breweries: [] as Brewery[],
     query: '',
     isLoading: false,
-    
+    currentPage: 1,
+    hasMore: true,
   }),
   actions: {
     async searchBreweries(query: string, pagesLimit: number = 0) {
       this.isLoading = true
+      this.hasMore = true
       this.breweries = await fetchBreweries(query, pagesLimit)
+      this.isLoading = false
+    },
+    async loadMore() {
+      if (!this.hasMore) {
+        console.log('no more breweries to load') 
+        return
+      }
+      this.currentPage++
+      this.isLoading = true
+      const newBreweries = await fetchBreweriesPage(this.query, this.currentPage)
+      console.log('new breweries', newBreweries)
+      newBreweries.length === 0 && (this.hasMore = false)
+      this.breweries.push(...newBreweries)
       this.isLoading = false
     }
   }
