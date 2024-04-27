@@ -4,11 +4,8 @@ import { RouterLink, RouterView } from 'vue-router'
 
 const store = useBreweryStore()
 
-const handleSubmit = () => {
-  console.log('query', store.query)
-  store.searchBreweries(store.query)
-  console.log('stored breweries', store.breweries)
-  console.log('Menu button clicked')
+const handleSubmit = (pagesLimit: number) => {
+  store.searchBreweries(store.query, pagesLimit)
 }
 </script>
 
@@ -38,19 +35,25 @@ const handleSubmit = () => {
     >Documentation</a
   >
   <br />
-  <input
-    v-model="store.query"
-    @input="handleSubmit"
-    class="border border-gray-500 p-2"
-    placeholder="Search for a brewery"
-  />
-  <button
-    @click="handleSubmit"
-    class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4"
-  >
-    Search
-  </button>
-  <ul>
+
+  <div class="header flex gap-5 justify-center">
+    <h1 class="text-3xl text-white">Brewery Search</h1>
+    <div>
+      <input
+        v-model="store.query"
+        @input="handleSubmit(1)"
+        class="border border-gray-500 p-2"
+        placeholder="Search for a brewery"
+      />
+      <button
+        @click="handleSubmit(0)"
+        class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4"
+      >
+        Search
+      </button>
+    </div>
+  </div>
+  <ul class="flex flex-col mt-4 ml-80">
     <li v-for="(brewery, index) in store.breweries" :key="brewery.id" class="text-white mt-1">
       {{ index + 1 }} - {{ brewery.name }}
     </li>

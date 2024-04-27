@@ -25,8 +25,8 @@ export const useBreweryStore = defineStore('brewery', {
     query: ''
   }),
   actions: {
-    async searchBreweries(query: string) {
-      this.breweries = await fetchBreweries(query)
+    async searchBreweries(query: string, pagesLimit: number = 0) {
+      this.breweries = await fetchBreweries(query, pagesLimit)
     }
   }
 })

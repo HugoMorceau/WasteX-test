@@ -2,13 +2,13 @@ import axios from 'axios'
 
 const API_BASE_URL = 'https://api.openbrewerydb.org'
 
-export const fetchBreweries = async (query: string) => {
+export const fetchBreweries = async (query: string, pagesLimit: number = 0) => {
   let page = 1
-  const perPage = 200
+  const perPage = 20
   let hasMore = true
   const breweries: any[] = []
   try {
-    while (hasMore) {
+    while (hasMore && (!pagesLimit || page <= pagesLimit)) {
       console.log('fetching page', page)
 
       const response = await axios.get(
