@@ -22,11 +22,15 @@ interface Brewery {
 export const useBreweryStore = defineStore('brewery', {
   state: () => ({
     breweries: [] as Brewery[],
-    query: ''
+    query: '',
+    isLoading: false,
+    
   }),
   actions: {
     async searchBreweries(query: string, pagesLimit: number = 0) {
+      this.isLoading = true
       this.breweries = await fetchBreweries(query, pagesLimit)
+      this.isLoading = false
     }
   }
 })
