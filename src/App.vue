@@ -2,6 +2,7 @@
 import { useBreweryStore } from '@/stores/brewery'
 import SearchBar from './components/SearchBar.vue'
 import HomeView from './views/HomeView.vue'
+
 const store = useBreweryStore()
 const loadMore = () => {
   console.log(store.currentPage)

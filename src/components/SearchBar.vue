@@ -31,7 +31,7 @@ const handleSubmit = (pagesLimit: number) => {
   >
   <br />
 
-  <div class="header flex gap-5 justify-center h-96 bg-primary-200 rounded-2xl p-4 relative">
+  <div class="header flex gap-5 justify-center h-72 bg-primary-200 rounded-2xl p-4 relative">
     <!-- <div class="object-cover w-1/4 h-full absolute right-0 top-1/2"> -->
 
     <img
@@ -47,12 +47,12 @@ const handleSubmit = (pagesLimit: number) => {
         <input
           v-model="store.query"
           @input="debouncedSearch(1)"
-          class="border border-gray-500 p-2"
+          class="border border-gray-500 p-2 hover:text-secondary-100"
           placeholder="Search for a brewery"
         />
         <button
           @click="handleSubmit(2)"
-          class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-4"
+          class="bg-secondary-100 hover:bg-amber-800 text-white font-bold py-2 px-4"
         >
           Search
         </button>

@@ -45,35 +45,48 @@ function toggleDetails(brewery) {
       {{ store.isLoading ? 'loading. . .' : store.breweries.length === 0 ? 'no result' : '' }}
     </p>
 
-    <ul class="flex flex-row flex-wrap gap-2 justify-center">
+    <ul class="flex flex-row flex-wrap gap-2 justify-start">
       <li
         v-for="(brewery, index) in store.breweries"
         :key="brewery.id"
-        class="flex h-36 bg-primary-200 text-primary-text rounded-lg shadow-md p-4 hover:bg-primary-hover hover:text-primary-100"
-        style="width: calc(50% - 0.5rem)"
+        class="group flex gap-2 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 transition-all"
+        :style="{
+          width: showDetails[brewery.id] ? '100%' : 'calc(50% - 0.5rem)',
+          transition: 'width 0.5s ease'
+        }"
       >
         <img
           v-bind:src="images[brewery.brewery_type]"
           alt="brewery type"
-          class="w-32 h-32 rounded-md"
+          class="w-36 h-36 rounded-md grayscale group-hover:grayscale-0 transition-all"
         />
-        <h2 class="text-xl font-bold">{{ `${index + 1}.  ${brewery.name} ` }}</h2>
-
-        <p class="">{{ brewery.brewery_type }}</p>
-        <div class="mt-2">
-          <p v-if="brewery.city" class="">{{ `${brewery.city}, ${brewery.country}` }}</p>
-        </div>
-        <button @click="toggleDetails(brewery)" class="mt-2 text-sm bg-primary-300 p-2 rounded">
-          {{ showDetails[brewery.id] ? 'Hide Details' : 'Show Details' }}
-        </button>
-        <div v-if="showDetails[brewery.id]" class="mt-2">
-          <p>{{ `phone: ${brewery.phone}` }}</p>
-          <p>{{ brewery.address_1 }}</p>
-          <p>{{ brewery.address_2 }}</p>
-          <p>{{ brewery.address_3 }}</p>
-          <p>{{ brewery.state }}</p>
-          <p>{{ brewery.postal_code }}</p>
-          <p>{{ brewery.website_url }}</p>
+        <h2 class="text-xl font-bold">{{ `${index + 1}. ${brewery.name}` }}</h2>
+        <div class="flex flex-row">
+          <div class="mt-2">
+            <p v-if="brewery.city" class="mb-2">{{ `${brewery.city}, ${brewery.country}` }}</p>
+            <a
+              v-if="brewery.website_url"
+              :href="brewery.website_url"
+              class="text-primary-300 hover:underline hover:text-secondary-100"
+            >
+              {{ brewery.website_url }}
+            </a>
+          </div>
+          <button
+            @click="toggleDetails(brewery)"
+            class="mt-2 text-sm bg-primary-300 p-2 rounded text-start"
+          >
+            {{ showDetails[brewery.id] ? 'Hide Details' : 'Show Details' }}
+          </button>
+          <div v-if="showDetails[brewery.id]" class="mt-2">
+            <p class="">{{ brewery.brewery_type }}</p>
+            <p>{{ `phone: ${brewery.phone}` }}</p>
+            <p>{{ brewery.address_1 }}</p>
+            <p>{{ brewery.address_2 }}</p>
+            <p>{{ brewery.address_3 }}</p>
+            <p>{{ brewery.state }}</p>
+            <p>{{ brewery.postal_code }}</p>
+          </div>
         </div>
       </li>
     </ul>
