@@ -64,11 +64,9 @@ function toggleDetails(selectedBrewery) {
       {{
         store.isLoading
           ? 'loading. . .'
-          : store.previousQuery === 'init'
-            ? ''
-            : store.breweries.length === 0
-              ? `no result for "${store.previousQuery}" `
-              : ''
+          : store.breweries.length === 0 && store.query
+            ? `no result for "${store.query}" `
+            : ''
       }}
     </p>
 
