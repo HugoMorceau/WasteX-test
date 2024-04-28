@@ -9,9 +9,8 @@ import nanoImg from '@/assets/images/brewery-type/nano.webp'
 import planningImg from '@/assets/images/brewery-type/planning.webp'
 import proprietorImg from '@/assets/images/brewery-type/proprietor.webp'
 import regionalImg from '@/assets/images/brewery-type/regional.webp'
-
 import { useBreweryStore } from '@/stores/brewery'
-import { reactive } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const images = {
   regional: regionalImg,
@@ -23,18 +22,38 @@ const images = {
   bar: barImg,
   contract: contractImg,
   proprietor: proprietorImg,
-  closed: closedImg
+  closed: closedImg,
+  taproom: closedImg
 }
+let activeBreweryId = ref(null)
+const isMobile = ref(window.innerWidth <= 640)
+
+function updateWindowWidth() {
+  isMobile.value = window.innerWidth <= 640
+}
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth)
+})
 
 const store = useBreweryStore()
 
-const showDetails = reactive({})
-
-function toggleDetails(brewery) {
-  if (showDetails[brewery.id] === undefined) {
-    showDetails[brewery.id] = true
+function toggleDetails(selectedBrewery) {
+  if (activeBreweryId.value === selectedBrewery) {
+    activeBreweryId.value = null
   } else {
-    showDetails[brewery.id] = !showDetails[brewery.id]
+    if (!activeBreweryId.value) {
+      activeBreweryId.value = selectedBrewery
+      return
+    }
+    activeBreweryId.value = null // first hide the active one
+    setTimeout(() => {
+      // then show the selected one
+      activeBreweryId.value = selectedBrewery
+    }, 250)
   }
 }
 </script>
@@ -49,44 +68,64 @@ function toggleDetails(brewery) {
       <li
         v-for="(brewery, index) in store.breweries"
         :key="brewery.id"
-        class="group flex gap-2 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 transition-all"
+        class="group flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit"
         :style="{
-          width: showDetails[brewery.id] ? '100%' : 'calc(50% - 0.5rem)',
+          width:
+            activeBreweryId === brewery.id || isMobile
+              ? 'calc(100% - 0.5rem)'
+              : 'calc(50% - 0.5rem)',
           transition: 'width 0.5s ease'
         }"
       >
+        <!-- v-bind:src="images[brewery.brewery_type || 'closed']" -->
         <img
-          v-bind:src="images[brewery.brewery_type]"
+          v-bind:src="brewery.brewery_type ? images[brewery.brewery_type] : images['closed']"
           alt="brewery type"
           class="w-36 h-36 rounded-md grayscale group-hover:grayscale-0 transition-all"
         />
-        <h2 class="text-xl font-bold">{{ `${index + 1}. ${brewery.name}` }}</h2>
-        <div class="flex flex-row">
-          <div class="mt-2">
-            <p v-if="brewery.city" class="mb-2">{{ `${brewery.city}, ${brewery.country}` }}</p>
-            <a
-              v-if="brewery.website_url"
-              :href="brewery.website_url"
-              class="text-primary-300 hover:underline hover:text-secondary-100"
-            >
-              {{ brewery.website_url }}
-            </a>
+
+        <div
+          :class="
+            activeBreweryId === brewery.id
+              ? 'flex flex-row flex-wrap items-start gap-5 w-full'
+              : 'flex flex-col'
+          "
+        >
+          <div>
+            <h2 class="text-xl text-amber-500 font-bold">
+              {{ `${index + 1}. ${brewery.name}` }}
+            </h2>
+            <div class="mt-2">
+              <p v-if="brewery.city">{{ `${brewery.city}, ${brewery.country}` }}</p>
+              <a
+                v-if="brewery.website_url"
+                :href="brewery.website_url"
+                class="text-primary-300 hover:underline hover:text-secondary-100"
+              >
+                {{ brewery.website_url }}
+              </a>
+              <p v-if="activeBreweryId === brewery.id" class="mt-1">
+                {{ `Type : ${brewery.brewery_type}` }}
+              </p>
+            </div>
           </div>
+          <div v-if="activeBreweryId === brewery.id" class="mt-8 flex-grow flex gap-10">
+            <div>
+              <p>{{ `Address : ${brewery.address_1}` }}</p>
+              <p>{{ brewery.address_2 }}</p>
+              <p>{{ brewery.address_3 }}</p>
+              <p>{{ brewery.state }}</p>
+              <p>{{ brewery.postal_code }}</p>
+            </div>
+            <p>{{ `Phone: ${brewery.phone}` }}</p>
+          </div>
+
           <button
-            @click="toggleDetails(brewery)"
+            @click="toggleDetails(brewery.id)"
             class="mt-2 text-sm bg-primary-300 p-2 rounded text-start"
           >
-            {{ showDetails[brewery.id] ? 'Hide Details' : 'Show Details' }}
+            {{ activeBreweryId === brewery.id ? 'Hide Details' : 'Show Details' }}
           </button>
-          <div v-if="showDetails[brewery.id]" class="mt-2">
-            <p class="">{{ brewery.brewery_type }}</p>
-            <p>{{ `phone: ${brewery.phone}` }}</p>
-            <p>{{ brewery.address_1 }}</p>
-            <p>{{ brewery.address_2 }}</p>
-            <p>{{ brewery.address_3 }}</p>
-            <p>{{ brewery.state }}</p>
-            <p>{{ brewery.postal_code }}</p>
-          </div>
         </div>
       </li>
     </ul>

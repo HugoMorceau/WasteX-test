@@ -14,7 +14,7 @@ const handleSubmit = (pagesLimit: number) => {
 </script>
 
 <template>
-  <a
+  <!-- <a
     href="https://api.openbrewerydb.org/breweries"
     target="_blank"
     rel="noopener noreferrer"
@@ -28,7 +28,7 @@ const handleSubmit = (pagesLimit: number) => {
     rel="noopener noreferrer"
     class="mb-4 text-white"
     >Documentation</a
-  >
+  > -->
   <br />
 
   <div class="header flex gap-5 justify-center h-72 bg-primary-200 rounded-2xl p-4 relative">
