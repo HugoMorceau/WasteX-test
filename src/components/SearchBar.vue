@@ -27,7 +27,7 @@ const debouncedSearch = debounce((pagesLimit: number) => {
         <input
           v-model="store.query"
           @input="debouncedSearch(1)"
-          class="border border-gray-500 p-2 hover:text-secondary-100"
+          class="border border-gray-500 p-2 text-secondary-200"
           placeholder="Search for a brewery"
         />
         <button

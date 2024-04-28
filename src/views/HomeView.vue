@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BreweriesList from '@/components/BreweriesList.vue'
+import BreweryList from '@/components/BreweryList.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import { useBreweryStore } from '@/stores/brewery'
 const store = useBreweryStore()
@@ -10,8 +10,8 @@ const loadMore = () => {
 
 <template>
   <SearchBar />
-  <BreweriesList />
-  <button @click="loadMore" class="flex justify-center mt-2 text-primary-hover">
-    {{ store.hasMore ? 'Load More' : '' }}
+  <BreweryList />
+  <button @click="loadMore" class="flex w-full justify-center mt-4 mb-10 text-primary-hover">
+    {{ store.hasMore ? 'Load More . . .' : '' }}
   </button>
 </template>

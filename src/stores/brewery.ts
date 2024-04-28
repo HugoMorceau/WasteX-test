@@ -23,6 +23,7 @@ export const useBreweryStore = defineStore('brewery', {
   state: () => ({
     breweries: [] as Brewery[],
     query: '',
+    previousQuery: 'init',
     isLoading: false,
     currentPage: 1,
     perPage: 20,
@@ -30,9 +31,13 @@ export const useBreweryStore = defineStore('brewery', {
   }),
   actions: {
     async searchBreweries(query: string, pagesLimit: number = 0) {
+      if (query === this.previousQuery) {
+        return
+      }
       this.isLoading = true
       this.hasMore = true
       this.breweries = await fetchBreweries(query, pagesLimit)
+      this.previousQuery = query
       this.breweries.length < this.perPage && (this.hasMore = false)
       this.isLoading = false
     },

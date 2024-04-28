@@ -61,7 +61,15 @@ function toggleDetails(selectedBrewery) {
 <template>
   <div>
     <p class="text-primary-text text-center text-2xl font-bold mb-4">
-      {{ store.isLoading ? 'loading. . .' : store.breweries.length === 0 ? 'no result' : '' }}
+      {{
+        store.isLoading
+          ? 'loading. . .'
+          : store.previousQuery === 'init'
+            ? ''
+            : store.breweries.length === 0
+              ? `no result for "${store.previousQuery}" `
+              : ''
+      }}
     </p>
 
     <ul class="flex flex-row flex-wrap gap-2 justify-start">
@@ -113,11 +121,24 @@ function toggleDetails(selectedBrewery) {
             <div>
               <p>{{ `Address : ${brewery.address_1}` }}</p>
               <p>{{ brewery.address_2 }}</p>
-              <p>{{ brewery.address_3 }}</p>
               <p>{{ brewery.state }}</p>
               <p>{{ brewery.postal_code }}</p>
             </div>
             <p>{{ `Phone: ${brewery.phone}` }}</p>
+
+            <a
+              v-if="brewery.latitude && brewery.longitude"
+              :href="
+                'https://www.google.com/maps/dir/?api=1&destination=' +
+                brewery.latitude +
+                ',' +
+                brewery.longitude
+              "
+              target="_blank"
+              class="text-primary-300 hover:underline hover:text-secondary-100"
+            >
+              Find itinerary
+            </a>
           </div>
 
           <button
