@@ -22,7 +22,7 @@ const debouncedSearch = debounce((pagesLimit: number) => {
     />
 
     <div class="flex justify-center items-center gap-10">
-      <h1 class="text-3xl text-white">Find breweries :</h1>
+      <h1 class="text-3xl text-white">It's a Brewin' :</h1>
       <div>
         <input
           v-model="store.query"

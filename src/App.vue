@@ -5,6 +5,7 @@
     <header>
       <div class="wrapper">
         <nav class="flex items-center space-x-4 p-2">
+          <img src="/favicon.ico" alt="logo" class="w-10 h-10" />
           <RouterLink to="/" class="text-amber-500 hover:text-blue-700">Home</RouterLink>
           <RouterLink to="/bookmarks" class="text-amber-500 hover:text-blue-700"
             >Bookmarks</RouterLink

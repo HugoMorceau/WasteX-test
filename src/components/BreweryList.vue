@@ -10,7 +10,7 @@ import planningImg from '@/assets/images/brewery-type/planning.webp'
 import proprietorImg from '@/assets/images/brewery-type/proprietor.webp'
 import regionalImg from '@/assets/images/brewery-type/regional.webp'
 import { useBreweryStore } from '@/stores/brewery'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
 
 const images = {
   regional: regionalImg,
@@ -26,6 +26,27 @@ const images = {
   taproom: closedImg
 }
 let activeBreweryId = ref(null)
+let sibblingBreweryId = ref(null)
+
+watchEffect(() => {
+  if (activeBreweryId.value) {
+    const index = store.breweries.findIndex((brewery) => brewery.id === activeBreweryId.value)
+    // 2 items per row, if left (odd) the sibbling is the next one, if right (even) the sibbling is the previous one
+    if (index !== -1) {
+      const sibblingIndex = index % 2 === 0 ? index + 1 : index - 1
+      if (sibblingIndex < store.breweries.length) {
+        sibblingBreweryId.value = store.breweries[sibblingIndex].id
+        console.log('activeBreweryId', index)
+        console.log('sibblingBreweryId', sibblingIndex)
+      } else {
+        sibblingBreweryId.value = null
+      }
+    }
+  } else {
+    sibblingBreweryId.value = null
+  }
+})
+
 const isMobile = ref(window.innerWidth <= 640)
 
 function updateWindowWidth() {
@@ -50,16 +71,18 @@ function toggleDetails(selectedBrewery) {
       return
     }
     activeBreweryId.value = null // first hide the active one
-    setTimeout(() => {
-      // then show the selected one
-      activeBreweryId.value = selectedBrewery
-    }, 250)
+    activeBreweryId.value = selectedBrewery
+    // setTimeout(() => {
+    //   // then show the selected one
+    //   activeBreweryId.value = selectedBrewery
+    // }, 50)
   }
 }
 </script>
 
 <template>
   <div>
+    <!-- Loading text -->
     <p class="text-primary-text text-center text-2xl font-bold mb-4">
       {{
         store.isLoading
@@ -69,26 +92,37 @@ function toggleDetails(selectedBrewery) {
             : ''
       }}
     </p>
-
+    <!-- Brewery list -->
     <ul class="flex flex-row flex-wrap gap-2 justify-start">
+      <!-- Brewery Element -->
       <li
         v-for="(brewery, index) in store.breweries"
         :key="brewery.id"
         class="group flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit"
         :style="{
-          width:
-            activeBreweryId === brewery.id || isMobile
-              ? 'calc(100% - 0.5rem)'
-              : 'calc(50% - 0.5rem)',
+          // width:
+          //   activeBreweryId === brewery.id || isMobile
+          //     ? 'calc(80% - 0.5rem)'
+          //     : 'calc(50% - 0.5rem)',
+          width: isMobile
+            ? 'calc(100% - 0.5rem)'
+            : sibblingBreweryId === brewery.id
+              ? 'calc(20% - 0.5rem)'
+              : activeBreweryId === brewery.id
+                ? 'calc(80% - 0.5rem)'
+                : 'calc(50% - 0.5rem)',
           transition: 'width 0.5s ease'
+
+          // display: sibblingBreweryId === brewery.id ? 'none' : 'block'
         }"
       >
         <img
+          v-if="sibblingBreweryId !== brewery.id"
           v-bind:src="brewery.brewery_type ? images[brewery.brewery_type] : images['closed']"
           alt="brewery type"
           class="w-36 h-36 rounded-md grayscale group-hover:grayscale-0 transition-all"
         />
-
+        <!-- Brewery text content container -->
         <div
           :class="
             activeBreweryId === brewery.id
@@ -96,11 +130,12 @@ function toggleDetails(selectedBrewery) {
               : 'flex flex-col'
           "
         >
+          <!-- Basic infos  -->
           <div>
             <h2 class="text-xl text-amber-500 font-bold">
               {{ `${index + 1}. ${brewery.name}` }}
             </h2>
-            <div class="mt-2">
+            <div v-if="sibblingBreweryId !== brewery.id" class="mt-2">
               <p v-if="brewery.city">{{ `${brewery.city}, ${brewery.country}` }}</p>
               <a
                 v-if="brewery.website_url"
@@ -110,11 +145,20 @@ function toggleDetails(selectedBrewery) {
               >
                 {{ brewery.website_url }}
               </a>
-              <p v-if="activeBreweryId === brewery.id" class="mt-1">
+              <p class="mt-1">
                 {{ `Type : ${brewery.brewery_type}` }}
               </p>
             </div>
+            <!-- Show Brewery details button -->
+            <button
+              @click="toggleDetails(brewery.id)"
+              class="text-sm bg-primary-300 rounded text-start"
+            >
+              {{ activeBreweryId === brewery.id ? 'Hide Details' : 'Show Details' }}
+            </button>
           </div>
+
+          <!-- Details -->
           <div v-if="activeBreweryId === brewery.id" class="mt-8 flex-grow flex gap-10">
             <div>
               <p>{{ `Address : ${brewery.address_1}` }}</p>
@@ -126,25 +170,13 @@ function toggleDetails(selectedBrewery) {
 
             <a
               v-if="brewery.latitude && brewery.longitude"
-              :href="
-                'https://www.google.com/maps/dir/?api=1&destination=' +
-                brewery.latitude +
-                ',' +
-                brewery.longitude
-              "
+              :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
               target="_blank"
-              class="text-primary-300 hover:underline hover:text-secondary-100"
+              class="text-primary-300 hover:underline text-secondary-100"
             >
-              Find itinerary
+              Show on map
             </a>
           </div>
-
-          <button
-            @click="toggleDetails(brewery.id)"
-            class="mt-2 text-sm bg-primary-300 p-2 rounded text-start"
-          >
-            {{ activeBreweryId === brewery.id ? 'Hide Details' : 'Show Details' }}
-          </button>
         </div>
       </li>
     </ul>
