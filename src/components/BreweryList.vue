@@ -38,13 +38,12 @@ let sibblingBreweryId = ref(null)
 watchEffect(() => {
   if (activeBreweryId.value) {
     const index = breweries.value.findIndex((brewery) => brewery.id === activeBreweryId.value)
+
     // 2 items per row, if left (odd) the sibbling is the next one, if right (even) the sibbling is the previous one
     if (index !== -1) {
       const sibblingIndex = index % 2 === 0 ? index + 1 : index - 1
       if (sibblingIndex < breweries.value.length) {
-        sibblingBreweryId.value = breweries[sibblingIndex].id
-        console.log('activeBreweryId', index)
-        console.log('sibblingBreweryId', sibblingIndex)
+        sibblingBreweryId.value = breweries.value[sibblingIndex].id
       } else {
         sibblingBreweryId.value = null
       }
@@ -163,16 +162,18 @@ console.log('breweries', breweries)
               <p>{{ brewery.state }}</p>
               <p>{{ brewery.postal_code }}</p>
             </div>
-            <p>{{ `Phone: ${brewery.phone}` }}</p>
 
-            <a
-              v-if="brewery.latitude && brewery.longitude"
-              :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
-              target="_blank"
-              class="text-primary-300 hover:underline text-secondary-100"
-            >
-              Show on map
-            </a>
+            <div>
+              <p>{{ `Phone: ${brewery.phone}` }}</p>
+              <a
+                v-if="brewery.latitude && brewery.longitude"
+                :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
+                target="_blank"
+                class="text-primary-300 hover:underline text-secondary-100"
+              >
+                Show on map
+              </a>
+            </div>
           </div>
           <!-- Favorite -->
           <FavoriteToggle :breweryId="brewery.id" class="absolute right-2 top-2" />
