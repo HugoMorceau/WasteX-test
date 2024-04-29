@@ -24,6 +24,17 @@ export const fetchBreweriesByIDs = async (ids: string[]) => {
     return []
   }
 }
+export const fetchNearbyBreweries = async (lat: number, lng: number) => {
+  try {
+    const request = `${API_BASE_URL}/v1/breweries?by_dist=${lat},${lng}`
+
+    const response = await axios.get(request)
+    return response.data
+  } catch (error) {
+    console.error('Failed to fetch breweries:', error)
+    return []
+  }
+}
 
 export const fetchBreweries = async (query: string, pagesLimit: number = 0) => {
   let page = 1

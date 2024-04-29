@@ -1,9 +1,17 @@
 import type { Brewery } from '@/types/Brewery'
 import { defineStore } from 'pinia'
-import { fetchBreweries, fetchBreweriesPage } from '../api/openbrewery'
-
+import { fetchBreweries, fetchBreweriesPage, fetchNearbyBreweries } from '../api/openbrewery'
+interface BreweryState {
+  breweries: Brewery[]
+  breweriesCache: Map<string, Brewery[]>
+  query: string
+  isLoading: boolean
+  currentPage: number
+  perPage: number
+  hasMore: boolean
+}
 export const useBreweryStore = defineStore('brewery', {
-  state: () => ({
+  state: (): BreweryState => ({
     breweries: [] as Brewery[],
     breweriesCache: new Map<string, Brewery[]>(),
     query: '',
@@ -13,15 +21,31 @@ export const useBreweryStore = defineStore('brewery', {
     hasMore: false
   }),
   actions: {
+    async searchNearbyBreweries(lat: number, lng: number) {
+      if (lat === undefined || lng === undefined) {
+        return
+      }
+      this.isLoading = true
+      this.query = `nearby:${lat},${lng}`
+      if (this.breweriesCache.has(this.query)) {
+        this.breweries = this.breweriesCache.get(this.query) as Brewery[]
+        this.isLoading = false
+        this.query = ''
+        return
+      }
+      const fetchedBreweries = await fetchNearbyBreweries(lat, lng)
+      this.breweriesCache.set(this.query, fetchedBreweries)
+      this.breweries = fetchedBreweries
+      this.isLoading = false
+      this.query = ''
+    },
     async searchBreweries(query: string, pagesLimit: number = 0) {
       if (query === undefined) {
-        console.log('No query')
         return
       }
       this.isLoading = true
       this.query = query
       if (this.breweriesCache.has(query)) {
-        console.log('Using cached breweries')
         this.breweries = this.breweriesCache.get(query) as Brewery[]
         this.isLoading = false
         return
@@ -35,7 +59,6 @@ export const useBreweryStore = defineStore('brewery', {
     },
     async loadMore() {
       if (!this.hasMore) {
-        console.log('no more breweries to load')
         return
       }
       this.currentPage++
