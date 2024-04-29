@@ -135,6 +135,11 @@ function toggleDetails(selectedBrewery: string) {
             <h2 class="text-xl text-amber-500 font-bold">
               {{ `${index + 1}. ${brewery.name}` }}
             </h2>
+            <p
+              class="bg-primary-text text-sm text-primary-100 w-fit px-1 rounded-lg group-hover:bg-stone-300"
+            >
+              {{ `Type : ${brewery.brewery_type}` }}
+            </p>
             <div v-if="sibblingBreweryId !== brewery.id" class="mt-2">
               <p v-if="brewery.city">
                 {{ `${brewery.city}, ${brewery.country}` }}
@@ -147,9 +152,6 @@ function toggleDetails(selectedBrewery: string) {
               >
                 {{ brewery.website_url }}
               </a>
-              <p class="mt-1">
-                {{ `Type : ${brewery.brewery_type}` }}
-              </p>
             </div>
             <!-- Show Brewery details button -->
             <button
@@ -172,17 +174,17 @@ function toggleDetails(selectedBrewery: string) {
             </div>
 
             <div>
-              <p>
-                {{ `Phone: ${brewery.phone}` }}
-              </p>
               <a
                 v-if="brewery.latitude && brewery.longitude"
                 :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
                 target="_blank"
-                class="text-primary-300 hover:underline text-secondary-100"
+                class="text-primary-300 hover:underline text-secondary-100 flex mb-2"
               >
-                Show on map
+                <img src="@/assets/location.svg" alt="location" class="w-6 mr-2" /> Show on map
               </a>
+              <p>
+                {{ `Phone: ${brewery.phone}` }}
+              </p>
             </div>
           </div>
           <!-- Favorite -->
