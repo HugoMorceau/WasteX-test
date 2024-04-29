@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import barImg from '@/assets/images/brewery-type/bar.webp'
 import brewpubImg from '@/assets/images/brewery-type/brewpub.webp'
 import closedImg from '@/assets/images/brewery-type/closed.webp'
@@ -10,7 +10,8 @@ import planningImg from '@/assets/images/brewery-type/planning.webp'
 import proprietorImg from '@/assets/images/brewery-type/proprietor.webp'
 import regionalImg from '@/assets/images/brewery-type/regional.webp'
 import { useBreweryStore } from '@/stores/brewery'
-import { onMounted, onUnmounted, ref, toRefs, watchEffect } from 'vue'
+import type { Brewery } from '@/types/Brewery'
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import FavoriteToggle from './FavoriteToggle.vue'
 
 const images = {
@@ -27,23 +28,23 @@ const images = {
   taproom: closedImg
 }
 
-const props = defineProps({
-  breweries: Array
-})
-const { breweries } = toRefs(props)
+const props = defineProps<{
+  breweries: Brewery[]
+}>()
+
 const store = useBreweryStore()
-let activeBreweryId = ref(null)
-let sibblingBreweryId = ref(null)
+let activeBreweryId = ref<string | null>(null)
+let sibblingBreweryId = ref<string | null>(null)
 
 watchEffect(() => {
   if (activeBreweryId.value) {
-    const index = breweries.value.findIndex((brewery) => brewery.id === activeBreweryId.value)
+    const index = props.breweries.findIndex((brewery) => brewery.id === activeBreweryId.value)
 
     // 2 items per row, if left (odd) the sibbling is the next one, if right (even) the sibbling is the previous one
     if (index !== -1) {
       const sibblingIndex = index % 2 === 0 ? index + 1 : index - 1
-      if (sibblingIndex < breweries.value.length) {
-        sibblingBreweryId.value = breweries.value[sibblingIndex].id
+      if (sibblingIndex < props.breweries.length) {
+        sibblingBreweryId.value = props.breweries[sibblingIndex].id
       } else {
         sibblingBreweryId.value = null
       }
@@ -66,7 +67,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateWindowWidth)
 })
 
-function toggleDetails(selectedBrewery) {
+function toggleDetails(selectedBrewery: string) {
   if (activeBreweryId.value === selectedBrewery) {
     activeBreweryId.value = null
   } else {
@@ -78,7 +79,6 @@ function toggleDetails(selectedBrewery) {
     activeBreweryId.value = selectedBrewery
   }
 }
-console.log('breweries', breweries)
 </script>
 
 <template>
@@ -99,7 +99,7 @@ console.log('breweries', breweries)
       <li
         v-for="(brewery, index) in breweries"
         :key="brewery.id"
-        class="group flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit relative"
+        class="group relative flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg overflow-hidden hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit"
         :style="{
           width: isMobile
             ? 'calc(100% - 0.5rem)'
@@ -113,7 +113,11 @@ console.log('breweries', breweries)
       >
         <img
           v-if="sibblingBreweryId !== brewery.id"
-          v-bind:src="brewery.brewery_type ? images[brewery.brewery_type] : images['closed']"
+          v-bind:src="
+            brewery.brewery_type
+              ? images[brewery.brewery_type as keyof typeof images]
+              : images['closed']
+          "
           alt="brewery type"
           class="w-36 h-36 rounded-md grayscale group-hover:grayscale-0 transition-all"
         />
@@ -132,7 +136,9 @@ console.log('breweries', breweries)
               {{ `${index + 1}. ${brewery.name}` }}
             </h2>
             <div v-if="sibblingBreweryId !== brewery.id" class="mt-2">
-              <p v-if="brewery.city">{{ `${brewery.city}, ${brewery.country}` }}</p>
+              <p v-if="brewery.city">
+                {{ `${brewery.city}, ${brewery.country}` }}
+              </p>
               <a
                 v-if="brewery.website_url"
                 :href="brewery.website_url"
@@ -157,14 +163,18 @@ console.log('breweries', breweries)
           <!-- Details -->
           <div v-if="activeBreweryId === brewery.id" class="mt-9 flex-grow flex gap-10">
             <div>
-              <p>{{ `Address : ${brewery.address_1}` }}</p>
+              <p>
+                {{ `Address : ${brewery.address_1}` }}
+              </p>
               <p>{{ brewery.address_2 }}</p>
               <p>{{ brewery.state }}</p>
               <p>{{ brewery.postal_code }}</p>
             </div>
 
             <div>
-              <p>{{ `Phone: ${brewery.phone}` }}</p>
+              <p>
+                {{ `Phone: ${brewery.phone}` }}
+              </p>
               <a
                 v-if="brewery.latitude && brewery.longitude"
                 :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"

@@ -1,7 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import fullStar from '@/assets/fullStar.svg'
 import star from '@/assets/star.svg'
 import { useFavoritesStore } from '@/stores/favorite'
+
 const { breweryId } = defineProps(['breweryId'])
 const store = useFavoritesStore()
 
