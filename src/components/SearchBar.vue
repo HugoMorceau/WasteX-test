@@ -40,7 +40,7 @@ const debouncedSearch = debounce((pagesLimit: number) => {
 
 <template>
   <div
-    class="header flex flex-col gap-5 justify-center h-72 bg-primary-200 rounded-2xl p-4 relative"
+    class="flex flex-col gap-5 justify-center h-72 bg-primary-200 rounded-2xl p-4 relative sm:justify-start"
     :style="{
       background: 'linear-gradient(109.6deg, rgba(30, 30, 30, 0.93) 11.2%, rgb(40, 40, 41) 78.9%)'
     }"
@@ -51,8 +51,8 @@ const debouncedSearch = debounce((pagesLimit: number) => {
       class="object-contain h-2/5 absolute right-6 bottom-0"
     />
 
-    <div class="flex justify-center gap-10 items-end">
-      <h1 class="text-5xl font-semibold text-white">It's a Brewin' :</h1>
+    <div class="flex justify-center gap-10 items-end sm:gap-1">
+      <h1 class="text-5xl font-semibold text-white sm:text-2xl">It's a Brewin' :</h1>
       <div>
         <input
           v-model="store.query"

@@ -3,26 +3,32 @@ import fullStar from '@/assets/fullStar.svg'
 import star from '@/assets/star.svg'
 import { useFavoritesStore } from '@/stores/favorite'
 
-const { breweryId } = defineProps(['breweryId'])
 const store = useFavoritesStore()
 
-const toggleFavorite = (breweryId: string) => {
-  if (store.favorites.includes(breweryId)) {
-    store.removeFavorite(breweryId)
+const props = defineProps({
+  breweryId: {
+    type: String,
+    required: true
+  }
+})
+
+const toggleFavorite = () => {
+  if (isFavorite()) {
+    store.removeFavorite(props.breweryId)
   } else {
-    store.addFavorite(breweryId)
+    store.addFavorite(props.breweryId)
   }
 }
 
-const isFavorite = (breweryId: string) => {
-  return store.favorites.includes(breweryId)
+const isFavorite = () => {
+  return store.favorites.some((brewery) => brewery.id === props.breweryId)
 }
 </script>
 
 <template>
   <img
-    :src="isFavorite(breweryId) ? fullStar : star"
-    @click="toggleFavorite(breweryId)"
+    :src="isFavorite() ? fullStar : star"
+    @click="toggleFavorite()"
     class="w-6 h-6 cursor-pointer"
   />
 </template>

@@ -1,36 +1,41 @@
 import { fetchBreweriesByIDs } from '@/api/openbrewery'
+import type { Brewery } from '@/types/Brewery'
 import { defineStore } from 'pinia'
 
 export const useFavoritesStore = defineStore('favorites', {
   state: () => ({
-    favorites: [] as string[]
+    favorites: [] as Brewery[]
   }),
   actions: {
-    addFavorite(breweryId: string) {
+    async addFavorite(breweryId: string) {
       if (!breweryId) return
-      if (!this.favorites.includes(breweryId)) {
-        this.favorites.push(breweryId)
-        this.saveFavorites()
+      const existingBrewery = this.favorites.find((brewery) => brewery.id === breweryId)
+      if (!existingBrewery) {
+        const newBrewery = await fetchBreweriesByIDs([breweryId])
+        if (newBrewery[0]) {
+          this.favorites.push(newBrewery[0])
+          this.saveFavorites()
+        }
       }
     },
     removeFavorite(breweryId: string) {
-      this.favorites = this.favorites.filter((id: string) => id !== breweryId)
+      this.favorites = this.favorites.filter((brewery: Brewery) => brewery.id !== breweryId)
       this.saveFavorites()
     },
     saveFavorites() {
-      localStorage.setItem('favorites', JSON.stringify(this.favorites))
-    },
-    loadFavorites() {
-      const storedFavorites = localStorage.getItem('favorites')
-
-      if (storedFavorites) {
-        this.favorites = JSON.parse(storedFavorites)
+      const ids = this.favorites.map((brewery) => brewery.id)
+      if (ids.length === 0) {
+        localStorage.removeItem('favorites')
+        return
       }
+      localStorage.setItem('favorites', JSON.stringify(ids))
     },
-    async fetchFavorites() {
-      if (!this.favorites.length) return []
-      const favorites = await fetchBreweriesByIDs(this.favorites)
-      return favorites
+    async loadFavorites() {
+      const storedFavorites = localStorage.getItem('favorites')
+      if (storedFavorites) {
+        const ids = JSON.parse(storedFavorites)
+        this.favorites = await fetchBreweriesByIDs(ids)
+      }
     }
   }
 })

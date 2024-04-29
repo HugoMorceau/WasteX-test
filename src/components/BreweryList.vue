@@ -55,9 +55,11 @@ watchEffect(() => {
 })
 
 const isMobile = ref(window.innerWidth <= 640)
+const isMedium = ref(window.innerWidth <= 1022)
 
 function updateWindowWidth() {
   isMobile.value = window.innerWidth <= 640
+  isMedium.value = window.innerWidth <= 1022
 }
 onMounted(() => {
   window.addEventListener('resize', updateWindowWidth)
@@ -99,7 +101,7 @@ function toggleDetails(selectedBrewery: string) {
       <li
         v-for="(brewery, index) in breweries"
         :key="brewery.id"
-        class="group relative flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg overflow-hidden hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit"
+        class="group relative flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg overflow-hidden hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit sm:p-2 sm:pb-6"
         :style="{
           width: isMobile
             ? 'calc(100% - 0.5rem)'
@@ -112,12 +114,13 @@ function toggleDetails(selectedBrewery: string) {
         }"
       >
         <img
-          v-if="sibblingBreweryId !== brewery.id"
+          v-if="sibblingBreweryId !== brewery.id && !isMedium"
           v-bind:src="
             brewery.brewery_type
               ? images[brewery.brewery_type as keyof typeof images]
               : images['closed']
           "
+          @click="toggleDetails(brewery.id)"
           alt="brewery type"
           class="w-36 h-36 rounded-md grayscale group-hover:grayscale-0 transition-all"
         />
@@ -156,14 +159,14 @@ function toggleDetails(selectedBrewery: string) {
             <!-- Show Brewery details button -->
             <button
               @click="toggleDetails(brewery.id)"
-              class="text-sm bg-primary-300 rounded text-start"
+              class="text-sm bg-primary-300 rounded text-start absolute bottom-1 right-3 sm:left-3"
             >
               {{ activeBreweryId === brewery.id ? 'Hide Details' : 'Show Details' }}
             </button>
           </div>
 
           <!-- Details -->
-          <div v-if="activeBreweryId === brewery.id" class="mt-9 flex-grow flex gap-10">
+          <div v-if="activeBreweryId === brewery.id" class="mt-9 flex-grow flex gap-10 sm:mt-0">
             <div>
               <p>
                 {{ `Address : ${brewery.address_1}` }}
@@ -188,7 +191,11 @@ function toggleDetails(selectedBrewery: string) {
             </div>
           </div>
           <!-- Favorite -->
-          <FavoriteToggle :breweryId="brewery.id" class="absolute right-2 top-2" />
+          <FavoriteToggle
+            :breweryId="brewery.id"
+            v-if="sibblingBreweryId !== brewery.id"
+            class="absolute right-2 top-2"
+          />
         </div>
       </li>
     </ul>
