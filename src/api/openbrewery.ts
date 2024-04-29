@@ -14,6 +14,17 @@ export const fetchBreweriesPage = async (query: string, page: number) => {
     return []
   }
 }
+export const fetchBreweriesByIDs = async (ids: string[]) => {
+  try {
+    const request = `${API_BASE_URL}/v1/breweries?by_ids=${ids.join(',')}`
+    console.log(request)
+    const response = await axios.get(request)
+    return response.data
+  } catch (error) {
+    console.error('Failed to fetch breweries:', error)
+    return []
+  }
+}
 
 export const fetchBreweries = async (query: string, pagesLimit: number = 0) => {
   let page = 1

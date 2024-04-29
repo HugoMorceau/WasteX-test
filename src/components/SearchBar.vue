@@ -14,7 +14,12 @@ const debouncedSearch = debounce((pagesLimit: number) => {
 </script>
 
 <template>
-  <div class="header flex gap-5 justify-center h-72 bg-primary-200 rounded-2xl p-4 relative">
+  <div
+    class="header flex gap-5 justify-center h-72 bg-primary-200 rounded-2xl p-4 relative"
+    :style="{
+      background: 'linear-gradient(109.6deg, rgba(30, 30, 30, 0.93) 11.2%, rgb(40, 40, 41) 78.9%)'
+    }"
+  >
     <img
       src="@/assets/images/barrels.png"
       alt="brewery"

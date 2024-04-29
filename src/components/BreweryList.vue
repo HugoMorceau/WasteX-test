@@ -10,7 +10,8 @@ import planningImg from '@/assets/images/brewery-type/planning.webp'
 import proprietorImg from '@/assets/images/brewery-type/proprietor.webp'
 import regionalImg from '@/assets/images/brewery-type/regional.webp'
 import { useBreweryStore } from '@/stores/brewery'
-import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { onMounted, onUnmounted, ref, toRefs, watchEffect } from 'vue'
+import FavoriteToggle from './FavoriteToggle.vue'
 
 const images = {
   regional: regionalImg,
@@ -25,17 +26,23 @@ const images = {
   closed: closedImg,
   taproom: closedImg
 }
+
+const props = defineProps({
+  breweries: Array
+})
+const { breweries } = toRefs(props)
+const store = useBreweryStore()
 let activeBreweryId = ref(null)
 let sibblingBreweryId = ref(null)
 
 watchEffect(() => {
   if (activeBreweryId.value) {
-    const index = store.breweries.findIndex((brewery) => brewery.id === activeBreweryId.value)
+    const index = breweries.value.findIndex((brewery) => brewery.id === activeBreweryId.value)
     // 2 items per row, if left (odd) the sibbling is the next one, if right (even) the sibbling is the previous one
     if (index !== -1) {
       const sibblingIndex = index % 2 === 0 ? index + 1 : index - 1
-      if (sibblingIndex < store.breweries.length) {
-        sibblingBreweryId.value = store.breweries[sibblingIndex].id
+      if (sibblingIndex < breweries.value.length) {
+        sibblingBreweryId.value = breweries[sibblingIndex].id
         console.log('activeBreweryId', index)
         console.log('sibblingBreweryId', sibblingIndex)
       } else {
@@ -60,8 +67,6 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateWindowWidth)
 })
 
-const store = useBreweryStore()
-
 function toggleDetails(selectedBrewery) {
   if (activeBreweryId.value === selectedBrewery) {
     activeBreweryId.value = null
@@ -70,14 +75,11 @@ function toggleDetails(selectedBrewery) {
       activeBreweryId.value = selectedBrewery
       return
     }
-    activeBreweryId.value = null // first hide the active one
+    activeBreweryId.value = null // First hide the active one
     activeBreweryId.value = selectedBrewery
-    // setTimeout(() => {
-    //   // then show the selected one
-    //   activeBreweryId.value = selectedBrewery
-    // }, 50)
   }
 }
+console.log('breweries', breweries)
 </script>
 
 <template>
@@ -87,23 +89,19 @@ function toggleDetails(selectedBrewery) {
       {{
         store.isLoading
           ? 'loading. . .'
-          : store.breweries.length === 0 && store.query
+          : breweries.length === 0 && store.query
             ? `no result for "${store.query}" `
             : ''
       }}
     </p>
     <!-- Brewery list -->
-    <ul class="flex flex-row flex-wrap gap-2 justify-start">
+    <ul class="flex flex-row flex-wrap gap-2 justify-center">
       <!-- Brewery Element -->
       <li
-        v-for="(brewery, index) in store.breweries"
+        v-for="(brewery, index) in breweries"
         :key="brewery.id"
-        class="group flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit"
+        class="group flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg shadow-md hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit relative"
         :style="{
-          // width:
-          //   activeBreweryId === brewery.id || isMobile
-          //     ? 'calc(80% - 0.5rem)'
-          //     : 'calc(50% - 0.5rem)',
           width: isMobile
             ? 'calc(100% - 0.5rem)'
             : sibblingBreweryId === brewery.id
@@ -112,8 +110,6 @@ function toggleDetails(selectedBrewery) {
                 ? 'calc(80% - 0.5rem)'
                 : 'calc(50% - 0.5rem)',
           transition: 'width 0.5s ease'
-
-          // display: sibblingBreweryId === brewery.id ? 'none' : 'block'
         }"
       >
         <img
@@ -124,6 +120,7 @@ function toggleDetails(selectedBrewery) {
         />
         <!-- Brewery text content container -->
         <div
+          class="p-1"
           :class="
             activeBreweryId === brewery.id
               ? 'flex flex-row flex-wrap items-start gap-5 w-full'
@@ -159,7 +156,7 @@ function toggleDetails(selectedBrewery) {
           </div>
 
           <!-- Details -->
-          <div v-if="activeBreweryId === brewery.id" class="mt-8 flex-grow flex gap-10">
+          <div v-if="activeBreweryId === brewery.id" class="mt-9 flex-grow flex gap-10">
             <div>
               <p>{{ `Address : ${brewery.address_1}` }}</p>
               <p>{{ brewery.address_2 }}</p>
@@ -177,6 +174,8 @@ function toggleDetails(selectedBrewery) {
               Show on map
             </a>
           </div>
+          <!-- Favorite -->
+          <FavoriteToggle :breweryId="brewery.id" class="absolute right-2 top-2" />
         </div>
       </li>
     </ul>
