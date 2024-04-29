@@ -6,7 +6,7 @@ import { useFavoritesStore } from '@/stores/favorite'
 const { breweryId } = defineProps(['breweryId'])
 const store = useFavoritesStore()
 
-const toggleFavorite = (breweryId) => {
+const toggleFavorite = (breweryId: string) => {
   if (store.favorites.includes(breweryId)) {
     store.removeFavorite(breweryId)
   } else {
@@ -14,7 +14,7 @@ const toggleFavorite = (breweryId) => {
   }
 }
 
-const isFavorite = (breweryId) => {
+const isFavorite = (breweryId: string) => {
   return store.favorites.includes(breweryId)
 }
 </script>
