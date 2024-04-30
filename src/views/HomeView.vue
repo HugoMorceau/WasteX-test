@@ -12,7 +12,7 @@ const loadMore = () => {
 <template>
   <SearchBar />
   <BreweryList :breweries="store.breweries" />
-  <button @click="loadMore" class="flex w-full justify-center mt-4 mb-10 text-primary-hover">
+  <button @click="loadMore" class="mb-10 mt-4 flex w-full justify-center text-primary-hover">
     {{ store.hasMore ? 'Load More . . .' : '' }}
   </button>
 </template>

@@ -86,7 +86,7 @@ function toggleDetails(selectedBrewery: string) {
 <template>
   <div>
     <!-- Loading text -->
-    <p class="text-primary-text text-center text-2xl font-bold mb-4">
+    <p class="mb-4 text-center text-2xl font-bold text-primary-text">
       {{
         store.isLoading
           ? 'loading. . .'
@@ -96,12 +96,17 @@ function toggleDetails(selectedBrewery: string) {
       }}
     </p>
     <!-- Brewery list -->
-    <ul class="flex flex-row flex-wrap gap-2 justify-center">
+    <ul class="flex flex-row flex-wrap justify-center gap-2">
       <!-- Brewery Element -->
+      <!-- prettier-ignore -->
       <li
         v-for="(brewery, index) in breweries"
         :key="brewery.id"
-        class="group relative flex flex-row gap-2 max-h-36 bg-primary-200 text-primary-text rounded-lg overflow-hidden hover:bg-primary-hover hover:text-primary-100 sm:max-h-fit sm:p-2 sm:pb-6"
+        
+        class="group relative flex max-h-36 
+        flex-row gap-2 overflow-hidden rounded-lg
+      bg-primary-200 text-primary-text hover:bg-primary-hover
+      hover:text-primary-100 sm:max-h-fit sm:p-2 sm:pb-6"
         :style="{
           width: isMobile
             ? 'calc(100% - 0.5rem)'
@@ -114,44 +119,62 @@ function toggleDetails(selectedBrewery: string) {
         }"
       >
         <img
-          v-if="sibblingBreweryId !== brewery.id && !isMedium"
+          v-if="
+            sibblingBreweryId !== brewery.id &&
+            !isMedium
+          "
           v-bind:src="
             brewery.brewery_type
-              ? images[brewery.brewery_type as keyof typeof images]
+              ? images[
+                  brewery.brewery_type as keyof typeof images
+                ]
               : images['closed']
           "
           @click="toggleDetails(brewery.id)"
           alt="brewery type"
-          class="w-36 h-36 rounded-md grayscale group-hover:grayscale-0 transition-all"
+          class="h-36 w-36 rounded-md grayscale transition-all group-hover:grayscale-0"
         />
         <!-- Brewery text content container -->
         <div
           class="p-1"
           :class="
             activeBreweryId === brewery.id
-              ? 'flex flex-row flex-wrap items-start gap-5 w-full'
+              ? 'flex w-full flex-row flex-wrap items-start gap-5'
               : 'flex flex-col'
           "
         >
           <!-- Basic infos  -->
           <div>
-            <h2 class="text-xl text-amber-500 font-bold">
-              {{ `${index + 1}. ${brewery.name}` }}
+            <h2
+              class="text-xl font-bold text-amber-500"
+            >
+              {{
+                `${index + 1}. ${brewery.name}`
+              }}
             </h2>
             <p
-              class="bg-primary-text text-sm text-primary-100 w-fit px-1 rounded-lg group-hover:bg-stone-300"
+              class="w-fit rounded-lg bg-primary-text px-1 text-sm text-primary-100 group-hover:bg-stone-300"
             >
-              {{ `Type : ${brewery.brewery_type}` }}
+              {{
+                `Type : ${brewery.brewery_type}`
+              }}
             </p>
-            <div v-if="sibblingBreweryId !== brewery.id" class="mt-2">
+            <div
+              v-if="
+                sibblingBreweryId !== brewery.id
+              "
+              class="mt-2"
+            >
               <p v-if="brewery.city">
-                {{ `${brewery.city}, ${brewery.country}` }}
+                {{
+                  `${brewery.city}, ${brewery.country}`
+                }}
               </p>
               <a
                 v-if="brewery.website_url"
                 :href="brewery.website_url"
                 target="_blank"
-                class="text-primary-300 hover:underline hover:text-secondary-100"
+                class="text-primary-300 hover:text-secondary-100 hover:underline"
               >
                 {{ brewery.website_url }}
               </a>
@@ -159,17 +182,26 @@ function toggleDetails(selectedBrewery: string) {
             <!-- Show Brewery details button -->
             <button
               @click="toggleDetails(brewery.id)"
-              class="text-sm bg-primary-300 rounded text-start absolute bottom-1 right-3 sm:left-3"
+              class="bg-primary-300 absolute bottom-1 right-3 rounded text-start text-sm sm:left-3"
             >
-              {{ activeBreweryId === brewery.id ? 'Hide Details' : 'Show Details' }}
+              {{
+                activeBreweryId === brewery.id
+                  ? 'Hide Details'
+                  : 'Show Details'
+              }}
             </button>
           </div>
 
           <!-- Details -->
-          <div v-if="activeBreweryId === brewery.id" class="mt-9 flex-grow flex gap-10 sm:mt-0">
+          <div
+            v-if="activeBreweryId === brewery.id"
+            class="mt-9 flex flex-grow gap-10 sm:mt-0"
+          >
             <div>
               <p>
-                {{ `Address : ${brewery.address_1}` }}
+                {{
+                  `Address : ${brewery.address_1}`
+                }}
               </p>
               <p>{{ brewery.address_2 }}</p>
               <p>{{ brewery.state }}</p>
@@ -178,12 +210,20 @@ function toggleDetails(selectedBrewery: string) {
 
             <div>
               <a
-                v-if="brewery.latitude && brewery.longitude"
+                v-if="
+                  brewery.latitude &&
+                  brewery.longitude
+                "
                 :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
                 target="_blank"
-                class="text-primary-300 hover:underline text-secondary-100 flex mb-2"
+                class="text-primary-300 mb-2 flex text-secondary-100 hover:underline"
               >
-                <img src="@/assets/location.svg" alt="location" class="w-6 mr-2" /> Show on map
+                <img
+                  src="@/assets/location.svg"
+                  alt="location"
+                  class="mr-2 w-6"
+                />
+                Show on map
               </a>
               <p>
                 {{ `Phone: ${brewery.phone}` }}
@@ -193,7 +233,9 @@ function toggleDetails(selectedBrewery: string) {
           <!-- Favorite -->
           <FavoriteToggle
             :breweryId="brewery.id"
-            v-if="sibblingBreweryId !== brewery.id"
+            v-if="
+              sibblingBreweryId !== brewery.id
+            "
             class="absolute right-2 top-2"
           />
         </div>
@@ -201,5 +243,3 @@ function toggleDetails(selectedBrewery: string) {
     </ul>
   </div>
 </template>
-
-<style lang="scss" scoped></style>

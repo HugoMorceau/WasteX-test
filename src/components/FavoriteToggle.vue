@@ -29,6 +29,6 @@ const isFavorite = () => {
   <img
     :src="isFavorite() ? fullStar : star"
     @click="toggleFavorite()"
-    class="w-6 h-6 cursor-pointer"
+    class="h-6 w-6 cursor-pointer"
   />
 </template>
