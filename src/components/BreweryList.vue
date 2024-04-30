@@ -55,20 +55,6 @@ watchEffect(() => {
   }
 })
 const { isMobile, isMedium } = useWindowWidth()
-// const isMobile = ref(window.innerWidth <= 640)
-// const isMedium = ref(window.innerWidth <= 1022)
-
-// function updateWindowWidth() {
-//   isMobile.value = window.innerWidth <= 640
-//   isMedium.value = window.innerWidth <= 1022
-// }
-// onMounted(() => {
-//   window.addEventListener('resize', updateWindowWidth)
-// })
-
-// onUnmounted(() => {
-//   window.removeEventListener('resize', updateWindowWidth)
-// })
 
 function toggleDetails(selectedBrewery: string) {
   if (activeBreweryId.value === selectedBrewery) {
@@ -186,6 +172,7 @@ function toggleDetails(selectedBrewery: string) {
             <div>
               <a
                 v-if="brewery.latitude && brewery.longitude"
+                @click.stop
                 :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
                 target="_blank"
                 class="text-primary-300 mb-2 flex text-secondary-100 hover:underline"
@@ -202,6 +189,7 @@ function toggleDetails(selectedBrewery: string) {
         <!-- Favorite -->
         <FavoriteToggle
           :breweryId="brewery.id"
+          @click.stop
           v-if="sibblingBreweryId !== brewery.id"
           class="absolute right-2 top-2"
         />
