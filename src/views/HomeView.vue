@@ -9,7 +9,7 @@ const loadMoreButton = ref(null)
 const loadMore = () => {
   store.loadMore()
 }
-let observer
+let observer: IntersectionObserver | null = null
 onMounted(() => {
   observer = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
@@ -17,7 +17,9 @@ onMounted(() => {
     }
   })
 
-  observer.observe(loadMoreButton.value)
+  if (loadMoreButton.value) {
+    observer.observe(loadMoreButton.value)
+  }
 })
 
 onUnmounted(() => {
