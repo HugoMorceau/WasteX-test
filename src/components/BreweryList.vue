@@ -169,7 +169,7 @@ function toggleDetails(selectedBrewery: string) {
               <p>{{ brewery.postal_code }}</p>
             </div>
 
-            <div>
+            <div v-if="activeBreweryId === brewery.id">
               <a
                 v-if="brewery.latitude && brewery.longitude"
                 @click.stop
@@ -180,7 +180,7 @@ function toggleDetails(selectedBrewery: string) {
                 <img src="@/assets/location.svg" alt="location" class="mr-2 w-6" />
                 Show on map
               </a>
-              <p>
+              <p v-if="brewery.phone">
                 {{ `Phone: ${brewery.phone}` }}
               </p>
             </div>
