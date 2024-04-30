@@ -6,5 +6,8 @@ const store = useFavoritesStore()
 </script>
 
 <template>
-  <BreweryList :breweries="store.favorites" />
+  <div>
+    <BreweryList v-if="store.favorites.length > 0" :breweries="store.favorites" />
+    <p v-else class="mt-4 flex justify-center">No favorites yet.</p>
+  </div>
 </template>

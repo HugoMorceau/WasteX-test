@@ -11,8 +11,9 @@ import proprietorImg from '@/assets/images/brewery-type/proprietor.webp'
 import regionalImg from '@/assets/images/brewery-type/regional.webp'
 import { useBreweryStore } from '@/stores/brewery'
 import type { Brewery } from '@/types/Brewery'
-import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import FavoriteToggle from './FavoriteToggle.vue'
+import useWindowWidth from '@/composables/useWindowWidth'
 
 const images = {
   regional: regionalImg,
@@ -53,21 +54,21 @@ watchEffect(() => {
     sibblingBreweryId.value = null
   }
 })
+const { isMobile, isMedium } = useWindowWidth()
+// const isMobile = ref(window.innerWidth <= 640)
+// const isMedium = ref(window.innerWidth <= 1022)
 
-const isMobile = ref(window.innerWidth <= 640)
-const isMedium = ref(window.innerWidth <= 1022)
+// function updateWindowWidth() {
+//   isMobile.value = window.innerWidth <= 640
+//   isMedium.value = window.innerWidth <= 1022
+// }
+// onMounted(() => {
+//   window.addEventListener('resize', updateWindowWidth)
+// })
 
-function updateWindowWidth() {
-  isMobile.value = window.innerWidth <= 640
-  isMedium.value = window.innerWidth <= 1022
-}
-onMounted(() => {
-  window.addEventListener('resize', updateWindowWidth)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', updateWindowWidth)
-})
+// onUnmounted(() => {
+//   window.removeEventListener('resize', updateWindowWidth)
+// })
 
 function toggleDetails(selectedBrewery: string) {
   if (activeBreweryId.value === selectedBrewery) {
@@ -102,11 +103,11 @@ function toggleDetails(selectedBrewery: string) {
       <li
         v-for="(brewery, index) in breweries"
         :key="brewery.id"
-        
-        class="group relative flex max-h-36 
-        flex-row gap-2 overflow-hidden rounded-lg
-      bg-primary-200 text-primary-text hover:bg-primary-hover
-      hover:text-primary-100 sm:max-h-fit sm:p-2 sm:pb-6"
+        @click="toggleDetails(brewery.id)"
+        class="group relative flex max-h-36 flex-row gap-2 overflow-hidden 
+               rounded-lg bg-primary-200 text-primary-text 
+               hover:bg-primary-hover hover:text-primary-100 
+                sm:max-h-fit  sm:pb-6 pr-6"
         :style="{
           width: isMobile
             ? 'calc(100% - 0.5rem)'
@@ -117,22 +118,17 @@ function toggleDetails(selectedBrewery: string) {
                 : 'calc(50% - 0.5rem)',
           transition: 'width 0.5s ease'
         }"
-      >
+      ><!-- prettier-ignore-end -->
         <img
-          v-if="
-            sibblingBreweryId !== brewery.id &&
-            !isMedium
-          "
+          v-if="sibblingBreweryId !== brewery.id && !isMedium"
           v-bind:src="
             brewery.brewery_type
-              ? images[
-                  brewery.brewery_type as keyof typeof images
-                ]
+              ? images[brewery.brewery_type as keyof typeof images]
               : images['closed']
           "
-          @click="toggleDetails(brewery.id)"
+          
           alt="brewery type"
-          class="h-36 w-36 rounded-md grayscale transition-all group-hover:grayscale-0"
+          class="h-36 w-36 rounded-md grayscale transition-all group-hover:grayscale-0 hover:cursor-pointer"
         />
         <!-- Brewery text content container -->
         <div
@@ -145,33 +141,21 @@ function toggleDetails(selectedBrewery: string) {
         >
           <!-- Basic infos  -->
           <div>
-            <h2
-              class="text-xl font-bold text-amber-500"
-            >
-              {{
-                `${index + 1}. ${brewery.name}`
-              }}
+            <h2 class="text-xl font-bold text-amber-500 hover:cursor-pointer">
+              {{ `${index + 1}. ${brewery.name}` }}
             </h2>
             <p
               class="w-fit rounded-lg bg-primary-text px-1 text-sm text-primary-100 group-hover:bg-stone-300"
             >
-              {{
-                `Type : ${brewery.brewery_type}`
-              }}
+              {{ `Type : ${brewery.brewery_type}` }}
             </p>
-            <div
-              v-if="
-                sibblingBreweryId !== brewery.id
-              "
-              class="mt-2"
-            >
+            <div v-if="sibblingBreweryId !== brewery.id" class="mt-2">
               <p v-if="brewery.city">
-                {{
-                  `${brewery.city}, ${brewery.country}`
-                }}
+                {{ `${brewery.city}, ${brewery.country}` }}
               </p>
               <a
                 v-if="brewery.website_url"
+                @click.stop
                 :href="brewery.website_url"
                 target="_blank"
                 class="text-primary-300 hover:text-secondary-100 hover:underline"
@@ -181,27 +165,18 @@ function toggleDetails(selectedBrewery: string) {
             </div>
             <!-- Show Brewery details button -->
             <button
-              @click="toggleDetails(brewery.id)"
+              
               class="bg-primary-300 absolute bottom-1 right-3 rounded text-start text-sm sm:left-3"
             >
-              {{
-                activeBreweryId === brewery.id
-                  ? 'Hide Details'
-                  : 'Show Details'
-              }}
+              {{ activeBreweryId === brewery.id ? '< Hide Details' : 'Show Details >' }}
             </button>
           </div>
 
           <!-- Details -->
-          <div
-            v-if="activeBreweryId === brewery.id"
-            class="mt-9 flex flex-grow gap-10 sm:mt-0"
-          >
+          <div v-if="activeBreweryId === brewery.id" class="mt-9 flex flex-grow gap-10 sm:mt-0">
             <div>
               <p>
-                {{
-                  `Address : ${brewery.address_1}`
-                }}
+                {{ `Address : ${brewery.address_1}` }}
               </p>
               <p>{{ brewery.address_2 }}</p>
               <p>{{ brewery.state }}</p>
@@ -210,19 +185,12 @@ function toggleDetails(selectedBrewery: string) {
 
             <div>
               <a
-                v-if="
-                  brewery.latitude &&
-                  brewery.longitude
-                "
+                v-if="brewery.latitude && brewery.longitude"
                 :href="`https://www.google.com/maps/search/?api=1&query=${brewery.latitude},${brewery.longitude}`"
                 target="_blank"
                 class="text-primary-300 mb-2 flex text-secondary-100 hover:underline"
               >
-                <img
-                  src="@/assets/location.svg"
-                  alt="location"
-                  class="mr-2 w-6"
-                />
+                <img src="@/assets/location.svg" alt="location" class="mr-2 w-6" />
                 Show on map
               </a>
               <p>
@@ -230,15 +198,13 @@ function toggleDetails(selectedBrewery: string) {
               </p>
             </div>
           </div>
-          <!-- Favorite -->
-          <FavoriteToggle
-            :breweryId="brewery.id"
-            v-if="
-              sibblingBreweryId !== brewery.id
-            "
-            class="absolute right-2 top-2"
-          />
         </div>
+        <!-- Favorite -->
+        <FavoriteToggle
+          :breweryId="brewery.id"
+          v-if="sibblingBreweryId !== brewery.id"
+          class="absolute right-2 top-2"
+        />
       </li>
     </ul>
   </div>

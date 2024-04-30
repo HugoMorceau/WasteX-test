@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { useBreweryStore } from '@/stores/brewery'
 import debounce from 'lodash/debounce'
+import { ref } from 'vue'
+import useWindowWidth from '@/composables/useWindowWidth'
 
 const store = useBreweryStore()
+const { isMobile } = useWindowWidth()
 
 const handleSubmit = (pagesLimit: number) => {
   store.searchBreweries(store.query, pagesLimit)
 }
+const isInputFocused = ref(false)
 function getNearbyBreweries(position: GeolocationPosition) {
   store.searchNearbyBreweries(position.coords.latitude, position.coords.longitude)
 }
@@ -42,21 +46,25 @@ const debouncedSearch = debounce((pagesLimit: number) => {
   <div
     class="relative flex h-72 flex-col justify-center gap-5 rounded-2xl bg-primary-200 p-4 sm:justify-start"
     :style="{
-      background: 'linear-gradient(109.6deg, rgba(30, 30, 30, 0.93) 11.2%, rgb(40, 40, 41) 78.9%)'
+      background: 'linear-gradient(109.6deg, rgba(30, 30, 30, 0.93) 11.2%, rgb(40, 40, 41) 78.9%)',
+      height: isMobile && isInputFocused ? '12rem' : '18rem'
     }"
   >
     <img
+      v-show="!isMobile || !isInputFocused"
       src="@/assets/images/barrels.png"
       alt="brewery"
-      class="absolute bottom-0 right-6 h-2/5 object-contain"
+      class="absolute bottom-0 right-6 h-28 object-contain sm:h-24"
     />
 
-    <div class="flex items-end justify-center gap-10 sm:gap-1">
-      <h1 class="text-5xl font-semibold text-white sm:text-2xl">It's a Brewin' :</h1>
+    <div class="flex items-end justify-center gap-10 sm:flex-col sm:items-center sm:gap-4">
+      <h1 class="text-5xl font-semibold text-white sm:text-3xl">It's a Brewin' :</h1>
       <div>
         <input
           v-model="store.query"
           @input="debouncedSearch(1)"
+          @focus="isInputFocused = true"
+          @blur="isInputFocused = false"
           class="rounded-xl border-2 p-2 text-secondary-200"
           placeholder="Search for a brewery"
         />
