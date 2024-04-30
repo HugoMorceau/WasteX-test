@@ -1,15 +1,27 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="flex flex-col">
+    <a
+      href="https://api.openbrewerydb.org/breweries"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mb-4 text-white"
+      >Open Brewery DB API</a
+    >
+
+    <a
+      href="https://www.openbrewerydb.org/documentation"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mb-4 text-white"
+      >Documentation</a
+    >
+
+    <a
+      href="https://github.com/HugoMorceau/WasteX-test"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mb-4 text-white"
+      >GitHub</a
+    >
   </div>
 </template>
-
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>
